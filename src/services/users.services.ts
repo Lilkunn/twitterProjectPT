@@ -17,10 +17,8 @@ class UsersService {
     // lay userid tu account vua tao
     const user_Id = result.insertedId.toString()
     // tu user_id tao AT vaf RT
-    const [accessToken, refreshToken] = await Promise.all([
-      this.signAccessToken(user_Id),
-      this.signRefreshToken(user_Id)
-    ])
+    const [accessToken, refreshToken] = await this.signAccessTKandRT(user_Id)
+
     return { accessToken, refreshToken }
   }
 
@@ -40,6 +38,15 @@ class UsersService {
       payload: { user_Id, token_type: TokenType.RefreshToken },
       options: { expiresIn: process.env.REFRESH_TOKEN_EXPIRE_IN }
     })
+  }
+  private signAccessTKandRT(user_Id: string) {
+    return Promise.all([this.signAccessToken(user_Id), this.signRefreshToken(user_Id)])
+  }
+  async login(user_Id: string) {
+    //dung user_id de tao AT và RT
+    const [accessToken, refreshToken] = await this.signAccessTKandRT(user_Id)
+    //return AT và RT
+    return { accessToken, refreshToken }
   }
 }
 const usersService = new UsersService()

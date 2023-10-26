@@ -1,10 +1,11 @@
 import { Router } from 'express'
-import { loginControllers, registerController } from '~/controllers/users.controllers'
+import { loginController, registerController } from '~/controllers/users.controllers'
 import { loginValidator, registerValidator } from '~/middlewares/users.middlewares'
+import { wrapAsync } from '~/utils/handlers'
 const userRouter = Router()
 
-userRouter.get('/login', loginValidator, loginControllers)
+userRouter.get('/login', loginValidator, loginController)
 
-userRouter.post('/register', registerValidator, registerController)
+userRouter.post('/register', registerValidator, wrapAsync(registerController))
 
 export default userRouter
