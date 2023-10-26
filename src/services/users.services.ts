@@ -4,6 +4,9 @@ import { RegisterRequestBody } from '~/models/requests/User.request'
 import { hashPassword } from '~/utils/crypto'
 import { signToken } from '~/utils/jwt'
 import { TokenType } from '~/constants/enums'
+import { ObjectId } from 'mongodb'
+import RefreshToken from '~/models/schemas/RefreshToken.schema'
+import { USERS_MESSAGES } from '~/constants/messages'
 
 class UsersService {
   async register(payload: RegisterRequestBody) {
@@ -17,9 +20,15 @@ class UsersService {
     // lay userid tu account vua tao
     const user_Id = result.insertedId.toString()
     // tu user_id tao AT vaf RT
-    const [accessToken, refreshToken] = await this.signAccessTKandRT(user_Id)
+    const [access_token, refresh_token] = await this.signAccessTKandRT(user_Id)
+    await databaseService.refreshTokens.insertOne(
+      new RefreshToken({
+        token: refresh_token,
+        user_id: new ObjectId(user_Id)
+      })
+    )
 
-    return { accessToken, refreshToken }
+    return { access_token, refresh_token }
   }
 
   async checkEmailExist(email: string) {
@@ -44,9 +53,21 @@ class UsersService {
   }
   async login(user_Id: string) {
     //dung user_id de tao AT và RT
-    const [accessToken, refreshToken] = await this.signAccessTKandRT(user_Id)
+    const [access_token, refresh_token] = await this.signAccessTKandRT(user_Id)
+    await databaseService.refreshTokens.insertOne(
+      new RefreshToken({
+        token: refresh_token,
+        user_id: new ObjectId(user_Id)
+      })
+    )
     //return AT và RT
-    return { accessToken, refreshToken }
+    return { access_token, refresh_token }
+  }
+  async logout(refessh_token: string) {
+    await databaseService.refreshTokens.deleteOne({ token: refessh_token })
+    return {
+      message: USERS_MESSAGES.LOGOUT_SUCCESS
+    }
   }
 }
 const usersService = new UsersService()

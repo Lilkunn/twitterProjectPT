@@ -7,7 +7,7 @@ type ErrorsType = Record<
     [key: string]: any
   }
 >
-
+// luu dinh nghia cua 1 loi
 // tạo ra class chuyên dùng để tạo ra lỗi có status rõ ràng
 export class ErrorWithStatus {
   message: string
