@@ -18,13 +18,13 @@ class UsersService {
       })
     )
     // lay userid tu account vua tao
-    const user_Id = result.insertedId.toString()
+    const user_id = result.insertedId.toString()
     // tu user_id tao AT vaf RT
-    const [access_token, refresh_token] = await this.signAccessTKandRT(user_Id)
+    const [access_token, refresh_token] = await this.signAccessTKandRT(user_id)
     await databaseService.refreshTokens.insertOne(
       new RefreshToken({
         token: refresh_token,
-        user_id: new ObjectId(user_Id)
+        user_id: new ObjectId(user_id)
       })
     )
 
@@ -36,28 +36,28 @@ class UsersService {
     const user = await databaseService.user.findOne({ email })
     return Boolean(user) //có true, k false
   }
-  private signAccessToken(user_Id: string) {
+  private signAccessToken(user_id: string) {
     return signToken({
-      payload: { user_Id, token_type: TokenType.AccessToken },
+      payload: { user_id, token_type: TokenType.AccessToken },
       options: { expiresIn: process.env.ACCESS_TOKEN_EXPIRE_IN }
     })
   }
-  private signRefreshToken(user_Id: string) {
+  private signRefreshToken(user_id: string) {
     return signToken({
-      payload: { user_Id, token_type: TokenType.RefreshToken },
+      payload: { user_id, token_type: TokenType.RefreshToken },
       options: { expiresIn: process.env.REFRESH_TOKEN_EXPIRE_IN }
     })
   }
-  private signAccessTKandRT(user_Id: string) {
-    return Promise.all([this.signAccessToken(user_Id), this.signRefreshToken(user_Id)])
+  private signAccessTKandRT(user_id: string) {
+    return Promise.all([this.signAccessToken(user_id), this.signRefreshToken(user_id)])
   }
-  async login(user_Id: string) {
+  async login(user_id: string) {
     //dung user_id de tao AT và RT
-    const [access_token, refresh_token] = await this.signAccessTKandRT(user_Id)
+    const [access_token, refresh_token] = await this.signAccessTKandRT(user_id)
     await databaseService.refreshTokens.insertOne(
       new RefreshToken({
         token: refresh_token,
-        user_id: new ObjectId(user_Id)
+        user_id: new ObjectId(user_id)
       })
     )
     //return AT và RT
