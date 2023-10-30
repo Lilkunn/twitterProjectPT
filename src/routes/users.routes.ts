@@ -20,5 +20,6 @@ method: POST
 header: authorrization: 'Bearer: access_token'
 body: (refessh_token: string)
 */
+// ...ne
 userRouter.post('/logout', accessTokenValidator, refreshTokenValidator, wrapAsync(logoutController))
 export default userRouter
