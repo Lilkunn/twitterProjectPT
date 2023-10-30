@@ -232,7 +232,10 @@ export const accessTokenValidator = validate(
             // sau đó decoderd_authorization để nhận đc
             // lưu vào req để dùng
             try {
-              const decoded_authorization = await verifyToken({ token: access_token })
+              const decoded_authorization = await verifyToken({
+                token: access_token,
+                secretOrPublicKey: process.env.JWT_SECRET_ACCESS_TOKEN as string
+              })
               //nếu không có lỗi thì ta lưu decoded_authorization vào req để khi nào muốn biết ai gữi req thì dùng
               ;(req as Request).decoded_authorization = decoded_authorization
             } catch (error) {
@@ -264,7 +267,10 @@ export const refreshTokenValidator = validate(
           //value là giá trị của Authorization, req là req của client gữi lên server
           options: async (value: string, { req }) => {
             try {
-              const decoded_refresh_token = await verifyToken({ token: value })
+              const decoded_refresh_token = await verifyToken({
+                token: value,
+                secretOrPublicKey: process.env.JWT_SECRET_REFRESH_TOKEN as string
+              })
               const refessh_token = await databaseService.refreshTokens.findOne({ token: value })
               if (refessh_token === null) {
                 // biến lại thanh lỗi 401
