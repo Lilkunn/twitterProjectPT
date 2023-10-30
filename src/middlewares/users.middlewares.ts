@@ -78,7 +78,8 @@ export const loginValidator = validate(
           errorMessage: USERS_MESSAGES.PASSWORD_MUST_BE_STRONG
         }
       }
-    },
+    }, // chỉ kiểm tra ở phần body
+    // (body, header,cookies, parram )
     ['body']
   )
 )
@@ -227,7 +228,9 @@ export const accessTokenValidator = validate(
                 status: HTTP_STATUS.UNAUTHORIZED //401
               })
             }
-
+            // nếu có accessToken thì mình pải verifyToken
+            // sau đó decoderd_authorization để nhận đc
+            // lưu vào req để dùng
             try {
               const decoded_authorization = await verifyToken({ token: access_token })
               //nếu không có lỗi thì ta lưu decoded_authorization vào req để khi nào muốn biết ai gữi req thì dùng
