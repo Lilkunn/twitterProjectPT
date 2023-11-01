@@ -90,6 +90,23 @@ class UsersService {
     }
   }
 
+  async resendEmailVerify(user_id: string) {
+    //tạo ra email_verify_token mới
+    const email_verify_token = await this.signEmailVerifyToken(user_id)
+
+    //vào database và cập nhật lại email_verify_token mới trong table user
+    await databaseService.user.updateOne({ _id: new ObjectId(user_id) }, [
+      {
+        $set: { email_verify_token, updated_at: '$$NOW' }
+      }
+    ])
+    //chưa làm chức năng gữi email, nên giả bộ ta đã gữi email cho client rồi, hiển thị bằng console.log
+    console.log(email_verify_token)
+    //trả về message
+    return {
+      message: USERS_MESSAGES.RESEND_VERIFY_EMAIL_SUCCESS
+    }
+  }
   async login(user_id: string) {
     //dung user_id de tao AT và RT
     const [access_token, refresh_token] = await this.signAccessTKandRT(user_id)

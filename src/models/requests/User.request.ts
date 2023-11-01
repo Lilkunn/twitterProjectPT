@@ -22,3 +22,10 @@ export interface TokenPayload extends JwtPayload {
   user_id: string
   token_type: TokenType
 }
+
+export interface VerifyEmailReqbody extends JwtPayload {
+  email_verify_token: string
+}
+export interface ForgotPasswordReqBody {
+  email: string
+}

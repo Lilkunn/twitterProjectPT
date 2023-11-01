@@ -3,11 +3,13 @@ import {
   emailVerifyController,
   loginController,
   logoutController,
-  registerController
+  registerController,
+  resendEmailVerifyController
 } from '~/controllers/users.controllers'
 import {
   accessTokenValidator,
   emailVerifyTokenValidator,
+  forgotPasswordValidator,
   loginValidator,
   refreshTokenValidator,
   registerValidator
@@ -40,4 +42,25 @@ userRouter.post('/logout', accessTokenValidator, refreshTokenValidator, wrapAsyn
  *body: {email_verify_token : string}
  */
 userRouter.post('/verify-email', emailVerifyTokenValidator, wrapAsync(emailVerifyController))
+
+/**
+ * des: resend email_verify_token
+ * khi email bị mất, hoặc hết hạn , thì người dùng sẽ muốn mình gửi lại email_verify_token
+ *
+ * method: post
+ * path: resend-email-verify-token
+ * header:{Authorization: "Bearer<access_token>"} đăng nhập đc mưới resend
+ * body: {}
+ */
+userRouter.post('/resend-verify-email', accessTokenValidator, wrapAsync(resendEmailVerifyController))
+
+/**
+ * des : forgot password
+ * khi người dùng quên mật khẩu thì họ cần mình gửi lại cho họ forgot_password
+ *path: /forgot-password
+  method: POST
+  Header: không cần, vì  ngta quên mật khẩu rồi, thì sao mà đăng nhập để có authen đc
+  body: {email: string}
+ */
+userRouter.post('/forgot-password', forgotPasswordValidator, wrapAsync(forgotPasswordController))
 export default userRouter

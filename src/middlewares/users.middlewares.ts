@@ -342,3 +342,36 @@ export const emailVerifyTokenValidator = validate(
     ['body']
   )
 )
+
+export const forgotPasswordValidator = validate(
+  checkSchema(
+    {
+      email: {
+        isEmail: {
+          errorMessage: USERS_MESSAGES.EMAIL_IS_INVALID
+        },
+        trim: true,
+        custom: {
+          options: async (value, { req }) => {
+            //tìm trong database xem có user nào sở hữu email = value của email người dùng gữi lên không
+            const user = await databaseService.user.findOne({
+              email: value
+            })
+            //nếu không tìm đc user thì nói user không tồn tại
+            //khỏi tiến vào controller nữa
+            if (user === null) {
+              throw new ErrorWithStatus({
+                message: USERS_MESSAGES.USER_NOT_FOUND,
+                status: HTTP_STATUS.NOT_FOUND
+              }) //422
+            }
+            //đến đâu thì oke
+            req.user = user // lưu user mới tìm đc lại luôn, khi nào cần thì xài
+            return true
+          }
+        }
+      }
+    },
+    ['body']
+  )
+)
