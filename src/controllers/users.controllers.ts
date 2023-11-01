@@ -3,7 +3,13 @@ import User from '~/models/schemas/User.schema'
 import databaseService from '~/services/database.services'
 import usersService from '~/services/users.services'
 import { ParamsDictionary } from 'express-serve-static-core'
-import { LogoutReqBody, RegisterRequestBody, TokenPayload, VerifyEmailReqbody } from '~/models/requests/User.request'
+import {
+  ForgotPasswordReqBody,
+  LogoutReqBody,
+  RegisterRequestBody,
+  TokenPayload,
+  VerifyEmailReqbody
+} from '~/models/requests/User.request'
 import { ObjectId } from 'mongodb'
 import { USERS_MESSAGES } from '~/constants/messages'
 import HTTP_STATUS from '~/constants/httpStatus'
@@ -119,5 +125,17 @@ export const resendEmailVerifyController = async (req: Request, res: Response) =
   //cập nhật email_verify_token mới và gữi lại email verify cho họ
   const result = await usersService.resendEmailVerify(user_id)
   //result chứa message nên ta chỉ cần trả  result về cho client
+  return res.json(result)
+}
+export const forgotPasswordController = async (
+  req: Request<ParamsDictionary, any, ForgotPasswordReqBody>,
+  res: Response,
+  next: NextFunction
+) => {
+  //middleware forgotPasswordValidator đã chạy rồi, nên ta có thể lấy _id từ user đã tìm đc bằng email
+  const { _id } = req.user as User
+  //cái _id này là objectid, nên ta phải chuyển nó về string
+  //chứ không truyền trực tiếp vào hàm forgotPassword
+  const result = await usersService.forgotPassword((_id as ObjectId).toString())
   return res.json(result)
 }

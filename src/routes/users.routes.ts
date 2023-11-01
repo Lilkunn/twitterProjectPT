@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import {
   emailVerifyController,
+  forgotPasswordController,
   loginController,
   logoutController,
   registerController,
@@ -63,4 +64,16 @@ userRouter.post('/resend-verify-email', accessTokenValidator, wrapAsync(resendEm
   body: {email: string}
  */
 userRouter.post('/forgot-password', forgotPasswordValidator, wrapAsync(forgotPasswordController))
+/*
+des: Verify link in email to reset password
+path: /verify-forgot-password
+method: POST
+Header: không cần, vì  ngta quên mật khẩu rồi, thì sao mà đăng nhập để có authen đc
+body: {forgot_password_token: string}
+*/
+userRouter.post(
+  '/verify-forgot-password',
+  verifyForgotPasswordTokenValidator,
+  wrapAsync(verifyForgotPasswordTokenController)
+)
 export default userRouter

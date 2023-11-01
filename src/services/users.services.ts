@@ -64,6 +64,14 @@ class UsersService {
     })
   }
 
+  //tạo hàm signForgotPasswordToken
+  private signForgotPasswordToken(user_id: string) {
+    return signToken({
+      payload: { user_id, token_type: TokenType.ForgotPasswordToken },
+      options: { expiresIn: process.env.FORGOT_PASSWORD_TOKEN_EXPIRE_IN },
+      privateKey: process.env.JWT_SECRET_FORGOT_PASSWORD_TOKEN as string //thêm
+    })
+  }
   private signAccessTKandRT(user_id: string) {
     return Promise.all([this.signAccessToken(user_id), this.signRefreshToken(user_id)])
   }
@@ -107,6 +115,22 @@ class UsersService {
       message: USERS_MESSAGES.RESEND_VERIFY_EMAIL_SUCCESS
     }
   }
+  async forgotPassword(user_id: string) {
+    //tạo ra forgot_password_token
+    const forgot_password_token = await this.signForgotPasswordToken(user_id)
+    //cập nhật vào forgot_password_token và user_id
+    await databaseService.user.updateOne({ _id: new ObjectId(user_id) }, [
+      {
+        $set: { forgot_password_token: forgot_password_token, updated_at: '$$NOW' }
+      }
+    ])
+
+    console.log(forgot_password_token)
+    return {
+      message: USERS_MESSAGES.CHECK_EMAIL_TO_RESET_PASSWORD
+    }
+  }
+
   async login(user_id: string) {
     //dung user_id de tao AT và RT
     const [access_token, refresh_token] = await this.signAccessTKandRT(user_id)
