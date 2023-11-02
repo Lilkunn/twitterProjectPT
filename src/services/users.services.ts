@@ -156,6 +156,20 @@ class UsersService {
     }
   }
 
+  async getMe(user_id: string) {
+    const user = await databaseService.user.findOne(
+      { _id: new ObjectId(user_id) },
+      {
+        projection: {
+          password: 0,
+          email_verify_token: 0,
+          forgot_password_token: 0
+        }
+      }
+    )
+    return user // sẽ k có những thuộc tính nêu trên, tránh bị lộ thông tin
+  }
+
   async login(user_id: string) {
     //dung user_id de tao AT và RT
     const [access_token, refresh_token] = await this.signAccessTKandRT(user_id)
