@@ -41,6 +41,7 @@ class UsersService {
     const user = await databaseService.user.findOne({ email })
     return Boolean(user) //có true, k false
   }
+
   private signAccessToken(user_id: string) {
     return signToken({
       payload: { user_id, token_type: TokenType.AccessToken },
@@ -48,6 +49,7 @@ class UsersService {
       privateKey: process.env.JWT_SECRET_ACCESS_TOKEN as string
     })
   }
+
   private signRefreshToken(user_id: string) {
     return signToken({
       payload: { user_id, token_type: TokenType.RefreshToken },
@@ -55,6 +57,7 @@ class UsersService {
       privateKey: process.env.JWT_SECRET_EMAIL_VERIFY_TOKEN as string
     })
   }
+
   // ham sighverify_email
   private signEmailVerifyToken(user_id: string) {
     return signToken({
@@ -72,6 +75,7 @@ class UsersService {
       privateKey: process.env.JWT_SECRET_FORGOT_PASSWORD_TOKEN as string //thêm
     })
   }
+
   private signAccessTKandRT(user_id: string) {
     return Promise.all([this.signAccessToken(user_id), this.signRefreshToken(user_id)])
   }
@@ -115,6 +119,7 @@ class UsersService {
       message: USERS_MESSAGES.RESEND_VERIFY_EMAIL_SUCCESS
     }
   }
+
   async forgotPassword(user_id: string) {
     //tạo ra forgot_password_token
     const forgot_password_token = await this.signForgotPasswordToken(user_id)
@@ -131,6 +136,26 @@ class UsersService {
     }
   }
 
+  async resetPassword({ user_id, password }: { user_id: string; password: string }) {
+    //tìm user thông qua user_id và cập nhật lại password và forgot_password_token
+    //tất nhiên là lưu password đã hash rồi
+    //ta không cần phải kiểm tra user có tồn tại không, vì forgotPasswordValidator đã làm rồi
+    await databaseService.user.updateOne({ _id: new ObjectId(user_id) }, [
+      {
+        $set: {
+          password: hashPassword(password),
+          forgot_password_token: '',
+          updated_at: '$$NOW'
+        }
+      }
+    ])
+    //nếu bạn muốn ngta đổi mk xong tự động đăng nhập luôn thì trả về access_token và refresh_token
+    //ở đây mình chỉ cho ngta đổi mk thôi, nên trả về message
+    return {
+      message: USERS_MESSAGES.RESET_PASSWORD_SUCCESS
+    }
+  }
+
   async login(user_id: string) {
     //dung user_id de tao AT và RT
     const [access_token, refresh_token] = await this.signAccessTKandRT(user_id)
@@ -143,6 +168,7 @@ class UsersService {
     //return AT và RT
     return { access_token, refresh_token }
   }
+
   async logout(refessh_token: string) {
     await databaseService.refreshTokens.deleteOne({ token: refessh_token })
     return {
@@ -150,5 +176,6 @@ class UsersService {
     }
   }
 }
+
 const usersService = new UsersService()
 export default usersService
