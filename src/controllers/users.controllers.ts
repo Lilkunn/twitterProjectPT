@@ -9,6 +9,7 @@ import {
   RegisterRequestBody,
   ResetPasswordReqBody,
   TokenPayload,
+  UpdateMeReqBody,
   VerifyEmailReqbody,
   VerifyForgotPasswordReqBody
 } from '~/models/requests/User.request'
@@ -21,7 +22,7 @@ import { UserVerifyStatus } from '~/constants/enums'
 export const loginController = async (req: Request, res: Response) => {
   const user = req.user as User // lấy user từ req
   const user_id = user._id as ObjectId // lấy _id từ user
-  const result = await usersService.login(user_id.toString())
+  const result = await usersService.login({ user_id: user_id.toString(), verify: user.verify })
   //login nhận vào user_id:string, nhưng user_id ta có
   //là objectid trên mongodb, nên phải toString()
   //trả ra kết quả, thiếu cái này là sending hoài luôn
@@ -135,10 +136,10 @@ export const forgotPasswordController = async (
   next: NextFunction
 ) => {
   //middleware forgotPasswordValidator đã chạy rồi, nên ta có thể lấy _id từ user đã tìm đc bằng email
-  const { _id } = req.user as User
+  const { _id, verify } = req.user as User
   //cái _id này là objectid, nên ta phải chuyển nó về string
   //chứ không truyền trực tiếp vào hàm forgotPassword
-  const result = await usersService.forgotPassword((_id as ObjectId).toString())
+  const result = await usersService.forgotPassword({ user_id: (_id as ObjectId).toString(), verify })
   return res.json(result)
 }
 export const verifyForgotPasswordTokenController = async (
@@ -171,6 +172,26 @@ export const getMeController = async (req: Request, res: Response, next: NextFun
   const result = await usersService.getMe(user_id) // hàm này ta chưa code, nhưng nó dùng user_id tìm user và trả ra user đó
   return res.json({
     message: USERS_MESSAGES.GET_ME_SUCCESS,
+    result
+  })
+}
+
+export const updateMeController = async (
+  req: Request<ParamsDictionary, any, UpdateMeReqBody>,
+  res: Response,
+  next: NextFunction
+) => {
+  //middleware accessTokenValidator đã chạy rồi, nên ta có thể lấy đc user_id từ decoded_authorization
+  const { user_id } = req.decoded_authorization as TokenPayload
+  //user_id để biết phải cập nhật ai
+  //lấy thông tin mới từ req.body
+  const { body } = req
+  //lấy các property mà client muốn cập nhật
+  //ta sẽ viết hàm updateMe trong user.services
+  //nhận vào user_id và body để cập nhật
+  const result = await usersService.updateMe(user_id, body)
+  return res.json({
+    message: USERS_MESSAGES.UPDATE_ME_SUCCESS, //meesage.ts thêm  UPDATE_ME_SUCCESS: 'Update me success'
     result
   })
 }
