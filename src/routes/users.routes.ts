@@ -3,6 +3,7 @@ import {
   emailVerifyController,
   forgotPasswordController,
   getMeController,
+  getProfileController,
   loginController,
   logoutController,
   registerController,
@@ -11,6 +12,7 @@ import {
   updateMeController,
   verifyForgotPasswordTokenController
 } from '~/controllers/users.controllers'
+import { filterMiddleware } from '~/middlewares/common.middleware'
 import {
   accessTokenValidator,
   emailVerifyTokenValidator,
@@ -23,6 +25,7 @@ import {
   verifiedUserValidator,
   verifyForgotPasswordTokenValidator
 } from '~/middlewares/users.middlewares'
+import { UpdateMeReqBody } from '~/models/requests/User.request'
 import { wrapAsync } from '~/utils/handlers'
 const userRouter = Router()
 
@@ -106,5 +109,29 @@ Header: {Authorization: Bearer <access_token>}
 body: {}
 */
 userRouter.get('/me', accessTokenValidator, wrapAsync(getMeController))
-userRouter.patch('/me', accessTokenValidator, verifiedUserValidator, updateMeValidator, wrapAsync(updateMeController))
+userRouter.patch(
+  '/me',
+  accessTokenValidator,
+  verifiedUserValidator,
+  filterMiddleware<UpdateMeReqBody>([
+    'name',
+    'date_of_birth',
+    'bio',
+    'location',
+    'website',
+    'avatar',
+    'username',
+    'cover_photo'
+  ]),
+  updateMeValidator,
+  wrapAsync(updateMeController)
+)
+
+/*
+des: get profile của user khác bằng unsername
+path: '/:username'
+method: get
+không cần header vì, chưa đăng nhập cũng có thể xem
+*/
+userRouter.get('/:username', wrapAsync(getProfileController))
 export default userRouter

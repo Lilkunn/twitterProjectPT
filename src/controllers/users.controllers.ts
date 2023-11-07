@@ -5,6 +5,7 @@ import usersService from '~/services/users.services'
 import { ParamsDictionary } from 'express-serve-static-core'
 import {
   ForgotPasswordReqBody,
+  GetProfileReqParams,
   LogoutReqBody,
   RegisterRequestBody,
   ResetPasswordReqBody,
@@ -195,3 +196,13 @@ export const updateMeController = async (
     result
   })
 }
+export const getProfileController = async (req: Request<GetProfileReqParams>, res: Response, next: NextFunction) => {
+  const { username } = req.params //lấy username từ query params
+  const result = await usersService.getProfile(username)
+  return res.json({
+    message: USERS_MESSAGES.GET_PROFILE_SUCCESS, //message.ts thêm  GET_PROFILE_SUCCESS: 'Get profile success',
+    result
+  })
+}
+//usersService.getProfile(username) nhận vào username tìm và return ra ngoài, hàm này chưa viết
+//giờ ta sẽ viết
