@@ -8,6 +8,7 @@ import {
   getProfileController,
   loginController,
   logoutController,
+  refreshTokenController,
   registerController,
   resendEmailVerifyController,
   resetPasswordController,
@@ -182,4 +183,13 @@ userRouter.put(
   changePasswordValidator,
   wrapAsync(changePasswordController)
 )
+
+/*
+  des: refreshtoken
+  path: '/refresh-token'
+  method: POST
+  Body: {refresh_token: string}
+g}
+  */
+userRouter.post('/refresh-token', refreshTokenValidator, wrapAsync(refreshTokenController))
 export default userRouter
