@@ -256,6 +256,31 @@ class UsersService {
       message: USERS_MESSAGES.FOLLOW_SUCCESS //trong message.ts thêm   FOLLOW_SUCCESS: 'Follow success'
     }
   }
+  async unfollow(user_id: string, followed_user_id: string) {
+    //kiểm tra xem đã follow hay chưa
+    const isFollowed = await databaseService.followers.findOne({
+      user_id: new ObjectId(user_id),
+      followed_user_id: new ObjectId(followed_user_id)
+    })
+
+    //nếu chưa follow thì return message là "đã unfollow trước đó" luôn
+    if (isFollowed == null) {
+      return {
+        message: USERS_MESSAGES.ALREADY_UNFOLLOWED // trong message.ts thêm ALREADY_UNFOLLOWED: 'Already unfollowed'
+      }
+    }
+
+    //nếu đang follow thì tìm và xóa document đó
+    const result = await databaseService.followers.deleteOne({
+      user_id: new ObjectId(user_id),
+      followed_user_id: new ObjectId(followed_user_id)
+    })
+
+    //nếu xóa thành công thì return message là unfollow success
+    return {
+      message: USERS_MESSAGES.UNFOLLOW_SUCCESS // trong message.ts thêm UNFOLLOW_SUCCESS: 'Unfollow success'
+    }
+  }
   async login({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
     //dung user_id de tao AT và RT
     const [access_token, refresh_token] = await this.signAccessTKandRT({

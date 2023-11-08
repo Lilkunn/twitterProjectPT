@@ -10,6 +10,7 @@ import {
   registerController,
   resendEmailVerifyController,
   resetPasswordController,
+  unfollowController,
   updateMeController,
   verifyForgotPasswordTokenController
 } from '~/controllers/users.controllers'
@@ -23,6 +24,7 @@ import {
   refreshTokenValidator,
   registerValidator,
   resetPasswordValidator,
+  unfollowValidator,
   updateMeValidator,
   verifiedUserValidator,
   verifyForgotPasswordTokenValidator
@@ -156,7 +158,7 @@ userRouter.post('/follow', accessTokenValidator, verifiedUserValidator, followVa
   g}
     */
 userRouter.delete(
-  '/follow/:user_id',
+  '/unfollow/:user_id',
   accessTokenValidator,
   verifiedUserValidator,
   unfollowValidator,
