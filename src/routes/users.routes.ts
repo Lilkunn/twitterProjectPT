@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import {
   emailVerifyController,
+  followController,
   forgotPasswordController,
   getMeController,
   getProfileController,
@@ -16,6 +17,7 @@ import { filterMiddleware } from '~/middlewares/common.middleware'
 import {
   accessTokenValidator,
   emailVerifyTokenValidator,
+  followValidator,
   forgotPasswordValidator,
   loginValidator,
   refreshTokenValidator,
@@ -29,7 +31,7 @@ import { UpdateMeReqBody } from '~/models/requests/User.request'
 import { wrapAsync } from '~/utils/handlers'
 const userRouter = Router()
 
-userRouter.get('/login', loginValidator, wrapAsync(loginController))
+userRouter.post('/login', loginValidator, wrapAsync(loginController))
 
 userRouter.post('/register', registerValidator, wrapAsync(registerController))
 
@@ -134,4 +136,30 @@ method: get
 không cần header vì, chưa đăng nhập cũng có thể xem
 */
 userRouter.get('/:username', wrapAsync(getProfileController))
+/*
+des: Follow someone
+path: '/follow'
+method: post
+headers: {Authorization: Bearer <access_token>}
+body: {followed_user_id: string}
+id user(20): 654b3a36f300cd696d404413
+id user(21): 654b3ba1e30e9c23c1149b57
+
+*/
+userRouter.post('/follow', accessTokenValidator, verifiedUserValidator, followValidator, wrapAsync(followController))
+
+/*
+    des: unfollow someone
+    path: '/follow/:user_id'
+    method: delete
+    headers: {Authorization: Bearer <access_token>}
+  g}
+    */
+userRouter.delete(
+  '/follow/:user_id',
+  accessTokenValidator,
+  verifiedUserValidator,
+  unfollowValidator,
+  wrapAsync(unfollowController)
+)
 export default userRouter
