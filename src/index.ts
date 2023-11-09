@@ -5,7 +5,7 @@ import { defaultErrorHandler } from './middlewares/error.middlewares'
 import mediasRouter from './routes/medias.routes'
 import { initFolder } from './utils/file'
 const app = express()
-const PORT = 4000
+const PORT = process.env.PORT || 4000
 // tạo folder uploads
 initFolder()
 app.use(express.json())

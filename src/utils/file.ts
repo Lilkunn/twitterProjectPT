@@ -3,11 +3,12 @@ import formidable, { File } from 'formidable'
 
 import fs from 'fs' //thư viện giúp handle các đường dẫn
 import path from 'path'
+import { UPLOAD_DIR, UPLOAD_TEMP_DIR } from '~/constants/dir'
 export const initFolder = () => {
   //nếu không có đường dẫn 'TwitterProject/uploads' thì tạo ra
   const uploadsFolderPath = path.resolve('uploads')
-  if (!fs.existsSync(uploadsFolderPath)) {
-    fs.mkdirSync(uploadsFolderPath, {
+  if (!fs.existsSync(UPLOAD_TEMP_DIR)) {
+    fs.mkdirSync(UPLOAD_TEMP_DIR, {
       recursive: true //cho phép tạo folder nested vào nhau
       //uploads/image/bla bla bla
     }) //mkdirSync: giúp tạo thư mục
@@ -15,7 +16,7 @@ export const initFolder = () => {
 }
 export const handleUploadSingleImage = async (req: Request): Promise<File> => {
   const form = formidable({
-    uploadDir: path.resolve('uploads'),
+    uploadDir: UPLOAD_TEMP_DIR,
     maxFiles: 1,
     keepExtensions: true,
     maxFileSize: 300 * 1024,
@@ -47,4 +48,9 @@ export const handleUploadSingleImage = async (req: Request): Promise<File> => {
       resolve((files.image as File[])[0])
     })
   })
+}
+export const getNameFromFullname = (filename: string) => {
+  const nameArr = filename.split('.')
+  nameArr.pop() //xóa phần tử cuối cùng, tức là xóa đuôi .png
+  return nameArr.join('') //nối lại thành chuỗi
 }
