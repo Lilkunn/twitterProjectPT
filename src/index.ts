@@ -7,8 +7,9 @@ import { initFolder } from './utils/file'
 import { config } from 'dotenv'
 config()
 import argv from 'minimist'
-import { UPLOAD_IMAGE_DIR } from './constants/dir'
+import { UPLOAD_IMAGE_DIR, UPLOAD_VIDEO_DIR } from './constants/dir'
 import staticRouter from './routes/static.routes'
+import { MongoClient } from 'mongodb'
 
 const options = argv(process.argv.splice(2))
 
@@ -27,7 +28,9 @@ app.use('/users', userRouter)
 //http://localhost:3000/users/tweets
 app.use('/medias', mediasRouter) //route handler
 app.use('/static', staticRouter)
+// app.use('/static/video', express.static(UPLOAD_VIDEO_DIR))
 // app sử dung 1 middleware 1 erorhandler tổng
+
 app.use(defaultErrorHandler)
 
 app.listen(PORT, () => {
