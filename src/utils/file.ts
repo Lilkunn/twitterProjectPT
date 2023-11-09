@@ -14,12 +14,12 @@ export const initFolder = () => {
     }) //mkdirSync: giúp tạo thư mục
   }
 }
-export const handleUploadSingleImage = async (req: Request): Promise<File> => {
+export const handleUploadImage = async (req: Request): Promise<File[]> => {
   const form = formidable({
     uploadDir: UPLOAD_TEMP_DIR,
-    maxFiles: 1,
+    maxFiles: 4,
     keepExtensions: true,
-    maxFileSize: 300 * 1024,
+    maxFileSize: 300 * 1024 * 4,
 
     filter: function ({ name, originalFilename, mimetype }) {
       console.log(name, originalFilename, mimetype) //log để xem, nhớ comment
@@ -39,13 +39,13 @@ export const handleUploadSingleImage = async (req: Request): Promise<File> => {
   })
   //form.parse về thành promise
   //files là object có dạng giống hình test code cuối cùng
-  return new Promise<File>((resolve, reject) => {
+  return new Promise<File[]>((resolve, reject) => {
     form.parse(req, (err, fields, files) => {
       if (err) return reject(err) //để ý dòng này
       if (!files.image) {
         return reject(new Error('Image is empty'))
       }
-      resolve((files.image as File[])[0])
+      resolve(files.image as File[])
     })
   })
 }

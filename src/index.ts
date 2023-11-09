@@ -8,6 +8,7 @@ import { config } from 'dotenv'
 config()
 import argv from 'minimist'
 import { UPLOAD_DIR } from './constants/dir'
+import staticRouter from './routes/static.routes'
 
 const options = argv(process.argv.splice(2))
 
@@ -25,7 +26,7 @@ app.get('/', (req, res) => {
 app.use('/users', userRouter)
 //http://localhost:3000/users/tweets
 app.use('/medias', mediasRouter) //route handler
-app.use('/static', express.static(UPLOAD_DIR))
+app.use('/static', staticRouter)
 // app sử dung 1 middleware 1 erorhandler tổng
 app.use(defaultErrorHandler)
 
