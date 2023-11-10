@@ -27,6 +27,11 @@ class DatabaseService {
   get user(): Collection<User> {
     return this.db.collection(process.env.DB_USERS_COLLECTION as string)
   }
+  async indexUser() {
+    await this.user.createIndex({ username: 1 }, { unique: true })
+    await this.user.createIndex({ email: 1 }, { unique: true })
+    await this.user.createIndex({ email: 1, password: 1 })
+  }
   get refreshTokens(): Collection<RefreshToken> {
     return this.db.collection(process.env.DB_REFRESH_TOKENS_COLLECTION as string)
   }

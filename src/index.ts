@@ -18,7 +18,9 @@ const PORT = process.env.PORT || 4000
 // tạo folder uploads
 initFolder()
 app.use(express.json())
-databaseService.conect()
+databaseService.conect().then(() => {
+  databaseService.indexUser()
+})
 
 app.get('/', (req, res) => {
   res.send('xin chao')
